@@ -1,0 +1,165 @@
+classDiagram
+direction TB
+
+class Cancellable {
+  <<interface>>
+  +cancelEvent(reason)
+  +calculateRefundAmount(tickets, price) double
+}
+class Streamable {
+  <<interface>>
+  +checkViewerCount(num)
+  +sendChatAnnouncement(message)
+}
+class Event {
+  <<abstract>>
+  -String id
+  -String eventName
+  -LocalDate date
+  -String location
+  -double ticketPrice
+  -boolean cancelled
+  +getCategory()* String
+  +calculateTotalRevenue(attendees, extra)* double
+  +advertiseEvent()*
+  +bookTicket()
+  +displayInfo()
+  +notifyParticipants(notifier, msg)
+  +equals() hashCode() compareTo()
+}
+class Concert {
+  -String artist
+  -String musicGenre
+  -double merchPrice
+  -songRequests : ArrayList
+  +requestSong(songName)
+}
+class Conference {
+  -String speaker
+  -String topic
+  +openRegistration(maxSeats)
+}
+class SportsMatch {
+  -String homeTeam
+  -String awayTeam
+  -double streamPrice
+  +updateScore(home, away)
+}
+class EventSchedule {
+  -String time
+  +printSchedule()
+}
+class Organizer {
+  -String name
+}
+class Sponsor {
+  -String name
+}
+class UserAccount {
+  -String username
+  -String password
+  -Role role
+  +toKey(username)$ String
+}
+class Role {
+  <<enumeration>>
+  ADMIN
+  USER
+}
+class Ticket {
+  +compareTo(other) int
+  -long id
+  -String username
+  -String eventName
+  -double price
+}
+class TicketRequest {
+  -long sequence
+  -RequestType type
+  -String username
+  -String eventName
+}
+class RequestType {
+  <<enumeration>>
+  REFUND
+  PURCHASE
+}
+class NotificationService {
+  +sendNotification(message)
+}
+class EventComparators {
+  <<utility>>
+  +BY_PRICE : Comparator
+  +BY_DATE : Comparator
+  +BY_LOCATION : Comparator
+  +BY_CATEGORY_THEN_PRICE_DESC : Comparator
+}
+class FileStorage {
+  +readLines(path)$
+  +writeLines(path, lines)$
+}
+class EventManagerService {
+  <<service>>
+  -eventsById : Map id-Event
+  -eventsByCategory : Map category-List
+  -eventsByOrganizer : Map name-TreeSet
+  -eventsBySponsor : Map name-TreeSet
+  -usersByName : Map login-UserAccount
+  -usersByRole : EnumMap role-List
+  -ticketsByUser : Map user-List
+  -ticketsByEvent : Map event-List
+  -requestQueue : PriorityQueue
+  +register(username, password, role, adminCode)
+  +authenticate(username, password)
+  +addEvent() updateEvent() removeEvent()
+  +cancelEvent(name, reason)
+  +submitRequest(type, user, event)
+  +processNextRequest()
+  +getSorted(comparator)
+  +buildReport()
+}
+class EventFileProcessor {
+  +loadEvents() saveEvents()
+  +parseEvent(line)$
+}
+class UserFileHandler {
+  +loadUsers() saveUsers()
+  +loadTickets() saveTickets()
+}
+class ConsoleInput {
+  +readLine(prompt)
+  +readText(prompt, default)
+  +readDouble(prompt)
+  +readInt(prompt)
+}
+class Main
+class DemoScenario
+
+Event ..|> Cancellable
+Event ..|> Comparable
+Ticket ..|> Comparable
+SportsMatch ..|> Streamable
+Event <|-- Concert
+Event <|-- Conference
+Event <|-- SportsMatch
+Event *-- EventSchedule : composition 1..1
+Organizer "1" o-- "*" Event : aggregation
+Sponsor "1" o-- "*" Event : aggregation
+UserAccount --> Role
+TicketRequest --> RequestType
+UserAccount "1" -- "*" Ticket : buys
+Event "1" -- "*" Ticket : N-M via Ticket
+UserAccount "1" -- "*" TicketRequest : submits
+EventManagerService o-- Event
+EventManagerService o-- UserAccount
+EventManagerService o-- Ticket
+EventManagerService o-- TicketRequest
+EventManagerService --> NotificationService
+EventManagerService ..> EventComparators : uses
+Main --> EventManagerService
+Main --> ConsoleInput
+Main ..> EventFileProcessor
+Main ..> UserFileHandler
+EventFileProcessor ..> FileStorage
+UserFileHandler ..> FileStorage
+DemoScenario --> EventManagerService

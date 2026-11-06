@@ -1,0 +1,4 @@
+CONCERT,Jazz Night,20.10.2026,Art Hall,3000,0,Local Band,Jazz,500,0,Global Media,TechCorp
+CONCERT,Shakira Live,18.10.2026,Bishkek Arena,15000,0,Shakira,Pop,2000,0,Global Media,TechCorp
+CONFERENCE,Tech Summit,12.10.2026,Tech Hub,1000,0,John Doe,AI,Global Media,TechCorp
+CONCERT,gnunu,11.11.1111,kmnjnm,123,klm,hij,123,Global Media,TechCorp
